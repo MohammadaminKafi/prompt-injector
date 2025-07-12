@@ -1,0 +1,79 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+
+# C extensions
+*.so
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Jupyter notebooks (optional)
+*.ipynb
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.bak
+run.log
+
+# Benchmarks and outputs
+*.json
+*.csv
+benchmark.json
+
+# Unit test / coverage artifacts
+htmlcov/
+.tox/
+.nox/
+.coverage
+coverage.xml
+.cache
+pytest_cache/
+tests/__pycache__/
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Docker
+*.env
+*.env.*
+docker-compose.override.yml
+
+# YAML secrets
+**/config/*.yaml
+!**/config/*example*.yaml
+
+# Ignore prompts if generated
+**/prompts/*.txt
+**/prompts/*.yaml
+
+# Override: include sample payloads
+!agent/prompts/sample_payloads.txt
+!simulator/prompts/canned_responses.yaml
+
+# Python dependency files
+poetry.lock
+Pipfile.lock
