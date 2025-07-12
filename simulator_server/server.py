@@ -18,7 +18,7 @@ def create_handler(level: str, model_config: dict):
         temperature=model_config["temperature"],
     )
 
-    return llm.
+    return llm
 
 
 @app.route("/ask", methods=["POST"])
