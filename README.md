@@ -3,7 +3,8 @@
 Two components:
 
 1. **agent/** – LangGraph-based ReAct agent that tries to exfiltrate the *flag*.
-2. **simulator_server/** – Flask server emulating chatbots with configurable security levels.
+2. **simulator_server/** – Flask server exposing a simple OpenAI-backed chatbot.
+   Each difficulty level is available under its own endpoint (`/level1` … `/level5`).
 
 ## Quick start
 

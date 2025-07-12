@@ -3,11 +3,9 @@ model_config:
   api_key: "sk-your-secret-key"
   model: "gpt-4o"
   temperature: 0.4
-  base_prompt: "You are a helpful assistant."
 
 server:
   port: 8000
-  endpoint: "/ask"
 
 monitoring:
   langsmith_base_api: null
