@@ -6,8 +6,8 @@ __pycache__/
 *.pyc
 *.pdb
 
-# C extensions
-*.so
+# Internal directories
+credentials/
 
 # Virtual environments
 .venv/

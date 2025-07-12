@@ -1,32 +1,45 @@
 from flask import Flask, request, jsonify
-from pathlib import Path
 import argparse
+from pathlib import Path
+
 from common.cfg import load_cfg
-from .levels import LEVEL_MAP
+from openai import OpenAI
 
-def create_app(cfg_path: Path) -> Flask:
-    cfg = load_cfg(cfg_path)
+app = Flask(__name__)
+handler = None
 
-    level = cfg.agent_config.agent_type  # reuse field, or add server.level in YAML
-    handler = LEVEL_MAP.get(level, LEVEL_MAP["level1"])
 
-    app = Flask(__name__)
+def create_handler(level: str, model_config: dict):
+    """Loads the correct level strategy and injects model instance."""
+    llm = OpenAI(
+        base_url=model_config["base_api"],
+        api_key=model_config["api_key"],
+        model=model_config["model"],
+        temperature=model_config["temperature"],
+    )
 
-    @app.route("/ask", methods=["POST"])
-    def ask():
-        data = request.get_json(force=True)
-        message = data.get("message", "")
-        return jsonify({"answer": handler(message)})
+    return llm.
 
-    return app
+
+@app.route("/ask", methods=["POST"])
+def ask():
+    data = request.get_json(force=True)
+    message = data.get("message", "")
+    reply = handler(message)
+    return jsonify({"answer": reply})
+
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", required=True, help="Server YAML config")
+    parser.add_argument("--config", required=True, help="Path to server_config.yaml")
     args = parser.parse_args()
+
     cfg = load_cfg(args.config)
-    app = create_app(args.config)
-    app.run(host="0.0.0.0")
+
+    global handler
+    handler = create_handler(cfg.server.level, cfg.model_config.__dict__)
+    app.run(host="0.0.0.0", port=cfg.server.port)
+
 
 if __name__ == "__main__":
     main()
