@@ -1,7 +1,7 @@
 from pathlib import Path
 import yaml
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any, Dict, Iterable
 
 @dataclass
 class ModelCfg:
@@ -42,6 +42,13 @@ class AgentFullCfg:
     agent_config: AgentCfg = field(default_factory=AgentCfg)
     monitoring: MonitoringCfg = field(default_factory=MonitoringCfg)
 
+def _validate_model_cfg(raw_model: Dict[str, Any], required: Iterable[str]) -> None:
+    missing = [key for key in required if not raw_model.get(key)]
+    if missing:
+        raise ValueError(
+            "Model configuration missing required fields: " + ", ".join(missing)
+        )
+
 def _load_raw(path: str | Path) -> Dict[str, Any]:
     with open(path) as f:
         return yaml.safe_load(f)
@@ -49,7 +56,9 @@ def _load_raw(path: str | Path) -> Dict[str, Any]:
 
 def load_server_cfg(path: str | Path) -> ServerFullCfg:
     raw = _load_raw(path)
-    model_cfg = ModelCfg(**raw.get("model_config", {}))
+    raw_model = raw.get("model_config", {})
+    _validate_model_cfg(raw_model, ("base_api", "api_key", "model"))
+    model_cfg = ModelCfg(**raw_model)
     server_cfg = ServerCfg(**raw.get("server", {}))
     monitoring_cfg = MonitoringCfg(**raw.get("monitoring", {}))
     return ServerFullCfg(
@@ -61,7 +70,9 @@ def load_server_cfg(path: str | Path) -> ServerFullCfg:
 
 def load_agent_cfg(path: str | Path) -> AgentFullCfg:
     raw = _load_raw(path)
-    model_cfg = ModelCfg(**raw.get("model_config", {}))
+    raw_model = raw.get("model_config", {})
+    _validate_model_cfg(raw_model, ("base_api", "api_key", "model"))
+    model_cfg = ModelCfg(**raw_model)
     agent_cfg = AgentCfg(**raw.get("agent_config", {}))
     monitoring_cfg = MonitoringCfg(**raw.get("monitoring", {}))
     return AgentFullCfg(
