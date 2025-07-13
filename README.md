@@ -22,3 +22,7 @@ bash scripts/run_agent.sh
 
 Both components read YAML configs (agent/config/…, simulator_server/config/…).
 
+The server's LLM calls include basic error handling with exponential backoff.
+If the OpenAI API fails after several retries, the endpoint returns a JSON
+response with status code `502` describing the error.
+

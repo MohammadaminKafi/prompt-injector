@@ -3,9 +3,17 @@
 from flask import Flask, request, jsonify
 import argparse
 from functools import partial
+from typing import Callable
 
 from common.cfg import load_server_cfg
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
+import requests
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
 
 
 # Pre-defined system prompts for each difficulty level
@@ -29,15 +37,30 @@ def create_app(cfg) -> Flask:
     app = Flask(__name__)
 
     def _call_llm(system_prompt: str, user_prompt: str) -> str:
-        resp = client.chat.completions.create(
-            model=cfg.model_config.model,
-            temperature=cfg.model_config.temperature,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
+        """Call the LLM with retries and error handling."""
+
+        @retry(
+            wait=wait_exponential(min=1, max=10),
+            stop=stop_after_attempt(3),
+            retry=retry_if_exception_type((OpenAIError, requests.exceptions.RequestException)),
+            reraise=True,
         )
-        return resp.choices[0].message.content
+        def _do_request() -> str:
+            resp = client.chat.completions.create(
+                model=cfg.model_config.model,
+                temperature=cfg.model_config.temperature,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+            )
+            return resp.choices[0].message.content
+
+        try:
+            return _do_request()
+        except (OpenAIError, requests.exceptions.RequestException) as exc:
+            # Propagate exception to be handled by the caller
+            raise exc
 
     def register_level_endpoint(level: str, prompt: str) -> None:
         endpoint = f"handle_{level}"
@@ -45,8 +68,11 @@ def create_app(cfg) -> Flask:
         def _handler(level_prompt=prompt):  # type: ignore
             data = request.get_json(force=True)
             message = data.get("message", "")
-            reply = _call_llm(level_prompt, message)
-            return jsonify({"answer": reply})
+            try:
+                reply = _call_llm(level_prompt, message)
+                return jsonify({"answer": reply})
+            except (OpenAIError, requests.exceptions.RequestException) as exc:
+                return jsonify({"error": str(exc)}), 502
 
         app.add_url_rule(f"/{level}", endpoint, _handler, methods=["POST"])
 
