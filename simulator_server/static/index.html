@@ -3,29 +3,43 @@
 <head>
 <meta charset="utf-8"/>
 <title>LLM Chat</title>
-<style>
-#chat { border: 1px solid #ccc; padding: 5px; height: 200px; overflow-y: scroll; }
-</style>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-<select id="level">
-  <option value="level1">Level 1</option>
-  <option value="level2">Level 2</option>
-  <option value="level3">Level 3</option>
-  <option value="level4">Level 4</option>
-  <option value="level5">Level 5</option>
-</select>
-<div id="chat"></div>
-<input type="text" id="msg" placeholder="Type your message"/>
-<button id="send">Send</button>
+<div id="container">
+  <select id="level">
+    <option value="level1">Level 1</option>
+    <option value="level2">Level 2</option>
+    <option value="level3">Level 3</option>
+    <option value="level4">Level 4</option>
+    <option value="level5">Level 5</option>
+  </select>
+  <div id="chat"></div>
+  <div>
+    <input type="text" id="msg" placeholder="Type your message"/>
+    <button id="send">Send</button>
+  </div>
+</div>
 <script>
+const addMessage = (author, text) => {
+  const chat = document.getElementById('chat');
+  const timestamp = new Date().toLocaleTimeString();
+  chat.innerHTML +=
+    '<div><b>' +
+    author +
+    ':</b> ' +
+    text +
+    ' <span class="timestamp">' +
+    timestamp +
+    '</span></div>';
+};
+
 document.getElementById('send').onclick = async () => {
   const level = document.getElementById('level').value;
   const input = document.getElementById('msg');
   const message = input.value;
   if (!message) return;
-  const chat = document.getElementById('chat');
-  chat.innerHTML += '<div><b>You:</b> ' + message + '</div>';
+  addMessage('You', message);
   input.value = '';
   try {
     const resp = await fetch('/' + level, {
@@ -34,10 +48,10 @@ document.getElementById('send').onclick = async () => {
       body: JSON.stringify({ message })
     });
     const data = await resp.json();
-    chat.innerHTML += '<div><b>LLM:</b> ' + (data.answer || data.error) + '</div>';
-    chat.scrollTop = chat.scrollHeight;
+    addMessage('LLM', data.answer || data.error);
+    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
   } catch (err) {
-    chat.innerHTML += '<div><b>Error:</b> ' + err + '</div>';
+    addMessage('Error', err);
   }
 };
 </script>
