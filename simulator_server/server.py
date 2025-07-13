@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 import argparse
 from functools import partial
 
-from common.cfg import load_cfg
+from common.cfg import load_server_cfg
 from openai import OpenAI
 
 
@@ -55,13 +55,14 @@ def create_app(cfg) -> Flask:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", required=True, help="Path to server_config.yaml")
+    parser.add_argument("--config", required=True, help="Path to server config YAML")
     args = parser.parse_args()
 
-    cfg = load_cfg(args.config)
+    cfg = load_server_cfg(args.config)
     app = create_app(cfg)
     app.run(host="0.0.0.0", port=cfg.server.port)
 
 
 if __name__ == "__main__":
     main()
+

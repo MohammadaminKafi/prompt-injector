@@ -21,12 +21,54 @@ class MonitoringCfg:
     langsmith_api_key: str | None = None
 
 @dataclass
-class FullCfg:
+class ServerCfg:
+    port: int = 8000
+
+@dataclass
+class ServerFullCfg:
+    model_config: ModelCfg
+    server: ServerCfg = field(default_factory=ServerCfg)
+    monitoring: MonitoringCfg = field(default_factory=MonitoringCfg)
+
+
+@dataclass
+class AgentFullCfg:
     model_config: ModelCfg
     agent_config: AgentCfg = field(default_factory=AgentCfg)
     monitoring: MonitoringCfg = field(default_factory=MonitoringCfg)
 
-def load_cfg(path: str | Path) -> FullCfg:
+def _load_raw(path: str | Path) -> Dict[str, Any]:
     with open(path) as f:
-        raw: Dict[str, Any] = yaml.safe_load(f)
-    return FullCfg(**raw)  # type: ignore[arg-type]
+        return yaml.safe_load(f)
+
+
+def load_server_cfg(path: str | Path) -> ServerFullCfg:
+    raw = _load_raw(path)
+    model_cfg = ModelCfg(**raw.get("model_config", {}))
+    server_cfg = ServerCfg(**raw.get("server", {}))
+    monitoring_cfg = MonitoringCfg(**raw.get("monitoring", {}))
+    return ServerFullCfg(
+        model_config=model_cfg,
+        server=server_cfg,
+        monitoring=monitoring_cfg,
+    )
+
+
+def load_agent_cfg(path: str | Path) -> AgentFullCfg:
+    raw = _load_raw(path)
+    model_cfg = ModelCfg(**raw.get("model_config", {}))
+    agent_cfg = AgentCfg(**raw.get("agent_config", {}))
+    monitoring_cfg = MonitoringCfg(**raw.get("monitoring", {}))
+    return AgentFullCfg(
+        model_config=model_cfg,
+        agent_config=agent_cfg,
+        monitoring=monitoring_cfg,
+    )
+
+
+def load_cfg(path: str | Path) -> AgentFullCfg | ServerFullCfg:
+    raw = _load_raw(path)
+    if "server" in raw and "agent_config" not in raw:
+        return load_server_cfg(path)
+    return load_agent_cfg(path)
+

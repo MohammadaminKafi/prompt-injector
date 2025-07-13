@@ -10,3 +10,4 @@ server:
 monitoring:
   langsmith_base_api: null
   langsmith_api_key: null
+
