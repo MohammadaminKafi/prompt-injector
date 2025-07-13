@@ -24,6 +24,10 @@ class MonitoringCfg:
 @dataclass
 class ServerCfg:
     port: int = 8000
+    # Optional base endpoint prefix. Unused by the current server
+    # implementation but tolerated in configuration files for
+    # forward compatibility.
+    endpoint: str | None = None
 
 @dataclass
 class ServerFullCfg:
