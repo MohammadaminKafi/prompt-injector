@@ -3,6 +3,8 @@ model_config:
   api_key: "sk-your-key"
   model: gpt-4o
   temperature: 0.3
+  # Optional system prompt prepended to every interaction
+  base_prompt: null
 
 agent_config:
   agent_type: react

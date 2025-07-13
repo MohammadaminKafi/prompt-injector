@@ -40,15 +40,20 @@ def create_app(cfg) -> Flask:
         return resp.choices[0].message.content
 
     def register_level_endpoint(level: str, prompt: str) -> None:
-        @app.route(f"/{level}", methods=["POST"])
+        endpoint = f"handle_{level}"
+
         def _handler(level_prompt=prompt):  # type: ignore
             data = request.get_json(force=True)
             message = data.get("message", "")
             reply = _call_llm(level_prompt, message)
             return jsonify({"answer": reply})
 
+        app.add_url_rule(f"/{level}", endpoint, _handler, methods=["POST"])
+
+    base_prompt = cfg.model_config.base_prompt or ""
     for level, prompt in LEVEL_PROMPTS.items():
-        register_level_endpoint(level, prompt)
+        full_prompt = f"{base_prompt} {prompt}".strip()
+        register_level_endpoint(level, full_prompt)
 
     return app
 

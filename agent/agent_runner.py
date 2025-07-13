@@ -19,7 +19,11 @@ def build_agent(cfg_path: Path):
         os.environ["LANGSMITH_TRACING"] = "true"
         os.environ["LANGSMITH_ENDPOINT"] = cfg.monitoring.langsmith_base_api
         os.environ["LANGSMITH_API_KEY"] = cfg.monitoring.langsmith_api_key
-    return create_react_agent(model, tools=[AskSimulator])
+    return create_react_agent(
+        model,
+        tools=[AskSimulator],
+        prompt=cfg.model_config.base_prompt,
+    )
 
 def run_agent():
     p = argparse.ArgumentParser()
