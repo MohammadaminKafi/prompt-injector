@@ -9,6 +9,7 @@ class ModelCfg:
     api_key: str
     model: str
     temperature: float = 0.7
+    base_prompt: str | None = None
 
 @dataclass
 class AgentCfg:

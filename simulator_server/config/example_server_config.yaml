@@ -3,6 +3,8 @@ model_config:
   api_key: "sk-your-secret-key"
   model: "gpt-4o"
   temperature: 0.4
+  # Optional prefix added before each level prompt
+  base_prompt: null
 
 server:
   port: 8000
