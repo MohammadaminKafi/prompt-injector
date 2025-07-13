@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>LLM Chat</title>
+<style>
+#chat { border: 1px solid #ccc; padding: 5px; height: 200px; overflow-y: scroll; }
+</style>
+</head>
+<body>
+<select id="level">
+  <option value="level1">Level 1</option>
+  <option value="level2">Level 2</option>
+  <option value="level3">Level 3</option>
+  <option value="level4">Level 4</option>
+  <option value="level5">Level 5</option>
+</select>
+<div id="chat"></div>
+<input type="text" id="msg" placeholder="Type your message"/>
+<button id="send">Send</button>
+<script>
+document.getElementById('send').onclick = async () => {
+  const level = document.getElementById('level').value;
+  const input = document.getElementById('msg');
+  const message = input.value;
+  if (!message) return;
+  const chat = document.getElementById('chat');
+  chat.innerHTML += '<div><b>You:</b> ' + message + '</div>';
+  input.value = '';
+  try {
+    const resp = await fetch('/' + level, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await resp.json();
+    chat.innerHTML += '<div><b>LLM:</b> ' + (data.answer || data.error) + '</div>';
+    chat.scrollTop = chat.scrollHeight;
+  } catch (err) {
+    chat.innerHTML += '<div><b>Error:</b> ' + err + '</div>';
+  }
+};
+</script>
+</body>
+</html>
