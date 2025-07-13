@@ -72,7 +72,7 @@ docker-compose.override.yml
 
 # Override: include sample payloads
 !agent/prompts/sample_payloads.txt
-!simulator/prompts/canned_responses.yaml
+!simulator_server/prompts/canned_responses.yaml
 
 # Python dependency files
 poetry.lock

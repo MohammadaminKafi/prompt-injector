@@ -1,5 +1,5 @@
 model_config:
-  base_api: https://you-provider.com
+  base_api: https://your-provider.com
   api_key: "sk-your-key"
   model: gpt-4o
   temperature: 0.3
@@ -11,3 +11,4 @@ agent_config:
 monitoring:
   langsmith_base_api: https://api.smith.langchain.com
   langsmith_api_key: null
+

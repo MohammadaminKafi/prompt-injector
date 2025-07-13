@@ -20,4 +20,5 @@ bash scripts/run_server.sh
 bash scripts/run_agent.sh
 ```
 
-Both components read YAML configs (agent/config/…, simulator/config/…).
+Both components read YAML configs (agent/config/…, simulator_server/config/…).
+

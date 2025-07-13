@@ -3,10 +3,10 @@ from pathlib import Path
 from langgraph.prebuilt import create_react_agent
 from langchain.chat_models import init_chat_model
 from .tools import AskSimulator
-from common.cfg import load_cfg
+from common.cfg import load_agent_cfg
 
 def build_agent(cfg_path: Path):
-    cfg = load_cfg(cfg_path)
+    cfg = load_agent_cfg(cfg_path)
     model = init_chat_model(
         model=cfg.model_config.model,
         model_provider="openai",

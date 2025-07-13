@@ -1,0 +1,4 @@
+# Example canned responses for tests
+hello: "Hello there!"
+bye: "Goodbye!"
+
