@@ -4,7 +4,8 @@ Two components:
 
 1. **agent/** – LangGraph-based ReAct agent that tries to exfiltrate the *flag*.
 2. **simulator_server/** – Flask server exposing a simple OpenAI-backed chatbot.
-   Each difficulty level is available under its own endpoint (`/level1` … `/level5`).
+   Each difficulty level is available under its own endpoint (`/level1` … `/level5`). Visiting `/`
+   serves a tiny web UI where you can chat with the LLM and pick the difficulty level.
    A health check endpoint (`/health`) returns `{"status": "ok"}`.
 
 ## Quick start

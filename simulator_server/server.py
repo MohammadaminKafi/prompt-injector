@@ -1,6 +1,6 @@
 """Simple Flask server wrapping an OpenAI LLM."""
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import argparse
 from functools import partial
 from typing import Callable
@@ -39,8 +39,12 @@ def create_app(cfg) -> Flask:
         api_key=cfg.model_config.api_key,
     )
 
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="static")
     app.add_url_rule("/health", "health", health, methods=["GET"])
+
+    @app.route("/")
+    def index():
+        return send_from_directory(app.static_folder, "index.html")
 
     def _call_llm(system_prompt: str, user_prompt: str) -> str:
         """Call the LLM with retries and error handling."""
